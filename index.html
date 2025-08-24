@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lydia Sorbo — Portfolio</title>
+  <meta name="description" content="Filterable, animated portfolio to showcase web projects with live links and source code." />
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --panel: #12161b;
+      --ink: #e9eef5;
+      --muted: #a6b3c2;
+      --brand: #e4afff; /* accent */
+      --ring: rgba(219, 174, 255, 0.6);
+      --card: #0f1318;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root { --bg: #f7f9fc; --panel:#ffffff; --card:#ffffff; --ink:#0e1116; --muted:#5b6572; --brand:#b472ca; --ring: rgba(200, 2, 255, 0.28); }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--ink); background: radial-gradient(1200px 600px at 90% -10%, rgba(125,211,252,.08), transparent 60%),
+      radial-gradient(1000px 800px at -10% 0%, rgba(99,102,241,.08), transparent 50%), var(--bg);
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+    header.site {
+      display: grid; gap: 10px; align-items: center; grid-template-columns: 1fr auto; padding: 1rem 2rem 24px; width: 100vw;
+      margin-left: calc(-50vw + 50%); position: sticky; top:0; z-index: 5; backdrop-filter: blur(8px); background: linear-gradient(to bottom, color-mix(in oklab, var(--bg), transparent 25%), transparent);
+    }
+    .brand { display:flex; align-items:center; gap:14px; color:#b472ca; }
+    .avatar { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--brand), #a78bfa); display:grid; place-items:center; color:#ffffff; font-weight:700; box-shadow: var(--shadow); letter-spacing:.5px; }
+    h1 { margin:0; font-size: clamp(20px, 3vw, 30px); }
+    .tagline { margin:0; color: var(--muted); font-size: 14px; }
+
+    .controls { display:flex; flex-wrap: wrap; gap:10px; justify-content:flex-end; }
+    .chip, .btn, .input { border-radius: 999px; border:1px solid color-mix(in oklab, var(--brand), transparent 70%); background: color-mix(in oklab, var(--panel), transparent 20%); color: var(--ink); }
+    .chip { padding: 8px 12px; cursor: pointer; user-select:none; font-weight:600; font-size: 13px; transition: .2s ease; }
+    .chip[aria-pressed="true"] { background: color-mix(in oklab, var(--brand), var(--panel) 80%); border-color: var(--brand); box-shadow: 0 0 0 3px var(--ring); }
+    .chip:hover { transform: translateY(-1px); }
+    .input { padding:10px 14px; min-width: 240px; outline:none; }
+    .input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--ring); }
+    .btn { padding:10px 14px; cursor:pointer; font-weight:700; }
+
+    .about { margin: 18px 0 8px; padding: 18px; background: color-mix(in oklab, var(--panel), transparent 10%); border:1px solid color-mix(in oklab, var(--brand), transparent 85%); border-radius: 16px; }
+    .about p { margin:0; color: var(--muted); }
+
+    .grid { display:grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap:16px; margin-top:18px; }
+    @media (min-width: 640px){ .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 980px){ .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+    .card { position: relative; overflow: clip; border-radius: 16px; background: linear-gradient(180deg, color-mix(in oklab, var(--card), transparent 8%), color-mix(in oklab, var(--panel), transparent 10%)); border:1px solid color-mix(in oklab, var(--brand), transparent 85%);
+      box-shadow: var(--shadow); transform: translateY(4px) scale(.98); opacity: 0; transition: transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .2s, opacity .5s;
+    }
+    .card.in { transform: translateY(0) scale(1); opacity: 1; }
+    .card:hover { box-shadow: 0 16px 50px rgba(0,0,0,.45); }
+    .thumb { aspect-ratio: 16/9; background: linear-gradient(135deg, color-mix(in oklab, var(--brand), transparent 60%), color-mix(in oklab, #a78bfa, transparent 60%)); display:grid; place-items:center; font-weight:700; letter-spacing:.4px; color:#0b0d10; }
+    .body { padding: 14px 14px 16px; display:grid; gap:10px; }
+    .title { margin:0; font-size: 18px; }
+    .desc { margin: 0; color: var(--muted); font-size: 14px; }
+    .tech { display:flex; flex-wrap:wrap; gap:6px; }
+    .badge { font-size: 12px; font-weight:700; padding:6px 10px; border-radius:999px; background: color-mix(in oklab, var(--brand), transparent 85%); border:1px solid color-mix(in oklab, var(--brand), transparent 60%); color: color-mix(in oklab, var(--ink), #093245 20%); }
+    .links { display:flex; gap:8px; }
+    .link { text-decoration:none; font-weight:800; padding:10px 12px; border-radius: 12px; border:1px solid color-mix(in oklab, var(--brand), transparent 65%); background: color-mix(in oklab, var(--panel), transparent 15%); color: var(--ink); outline:none; transition: .2s; }
+    .link:focus { box-shadow: 0 0 0 3px var(--ring); border-color: var(--brand); }
+    .link:hover { transform: translateY(-1px); }
+
+    .empty { text-align:center; color: var(--muted); padding: 24px; border: 1px dashed color-mix(in oklab, var(--brand), transparent 75%); border-radius:16px; }
+    footer { margin-top: 40px; color: var(--muted); text-align:center; }
+
+    .thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .readmore-btn {
+        display: inline-block;   /* make it shrink to text */
+        width: auto;             /* don’t stretch */
+        max-width: max-content;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 12px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: var(--brand);
+        color: #fff;
+        cursor: pointer;
+        outline: none;
+        transition: background 0.2s, transform 0.2s;
+        border: none;
+    }
+
+    .readmore-btn:hover {
+    transform: translateY(-1px);
+    background: color-mix(in oklab, var(--brand), #000 15%); /* darker hover */
+    }
+
+    .readmore-btn:focus {
+    box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* stretch to fill card */
+}
+
+.btm-buttons {
+  margin-top: auto;      /* pushes to bottom */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;             /* space between Read More + links */
+}
+    
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site" role="banner">
+      <div class="brand" aria-label="Site identity">
+        <div>
+          <h1>Lydia Sorbo</h1>
+          <p class="tagline">Front‑End Web Developer • Informatics • User-Oriented</p>
+        </div>
+      </div>
+      <div class="controls" role="region" aria-label="Filters and search">
+        <button class="chip" aria-pressed="true" data-filter="all">All</button>
+        <button class="chip" aria-pressed="false" data-filter="React">React</button>
+        <button class="chip" aria-pressed="false" data-filter="JavaScript">JavaScript</button>
+        <button class="chip" aria-pressed="false" data-filter="Node.js">Node.js</button>
+        <button class="chip" aria-pressed="false" data-filter="Agile Method">Agile Method</button>
+        <input class="input" id="q" type="search" placeholder="Search projects…" aria-label="Search projects" />
+      </div>
+    </header>
+
+    <section class="about" aria-label="About Lydia">
+      <p>
+        Hello! I'm Lydia and I build intuitive, user-centered web experiences. Explore some of my favorite projects below!
+        Each card links to the <strong>live site</strong> and the <strong>source code</strong> if it's publically available.
+      </p>
+    </section>
+
+    <section aria-label="Projects">
+        <div class="grid" id="grid">
+  
+            <article class="card" tabindex="0" data-tags="React,JavaScript,Agile Method" data-title="Career Survey Web App for Tribal Students" data-desc="A front-end React application for NOAA and the NWIFC, empowering tribal students to explore careers in nature conservation.">
+                <div class="thumb"><img src="/images/cedar.png" alt="Screenshot of Career Survey Web App"></div>
+                <div class="body">
+                  <h3 class="title">Career Survey Web App for Tribal Students</h3>
+                  <div class="tech"><span class="badge">React</span><span class="badge">JavaScript</span><span class="badge">Agile Method</span></div>
+                  <p class="desc" data-short="A front-end React application for NOAA and the NWIFC, empowering tribal students to explore careers in nature conservation. Awarded the “Bridge-Builder Award for Equity” at the 2025 UW iSchool Showcase." data-full="A front-end React application for the National Oceanic Atmospheric Association and the Northwest Indian Fisheries Commission featuring a comprehensive survey tool and interactive visualizations, empowering tribal students to explore careers in nature conservation. Awarded the “Bridge-Builder Award for Equity” at the 2025 UW iSchool Showcase. As one of two developers on a five-person team, I built the application from the ground up, implementing responsive, stakeholder-driven features. Followed Agile methodology with three sprints and continuous feedback loops to ensure alignment and usability.">Produced a front-end React application for the National Oceanic Atmospheric Association and the Northwest Indian Fisheries Commission featuring a comprehensive survey tool and interactive visualizations, empowering tribal students to explore careers in nature conservation...</p>
+                  <div class="btm-buttons">
+                  <span class="toggle-btn readmore-btn">Read More</span>
+                    <div class="links">
+                        <a class="link" href="https://careerpath.nwifc.org/" target="_blank" rel="noopener">View Website</a>
+                    </div>
+                </div>
+                </div>
+              </article>
+  
+          <article class="card" tabindex="0" data-tags="React,JavaScript,Node.js,MongoDB" data-title="Husky Study Scout" data-desc="Full-stack app for UW students to discover and review local study spots">
+            <div class="thumb"><img src="/images/huskyScout.png" alt="Screenshot of Husky Study Scout"></div>
+            <div class="body">
+              <h3 class="title">Husky Study Scout</h3>
+              <div class="tech"><span class="badge">React</span><span class="badge">JavaScript</span><span class="badge">Node.js</span><span class="badge">MongoDB</span></div>
+              <p class="desc" data-short="A full-stack web application built with React, Node.js, and MongoDB to help UW students easily discover and review local study spots." data-full="A full-stack web application built with React, Node.js, and MongoDB to help UW students easily discover and review local study spots. Within my development team, I focused on user authentication, leveraging backend REST API endpoints and Azure App Service for a seamless login experience.">A full-stack web application built with React, Node.js, and MongoDB to help UW students easily discover and review local study spots. Within my development team, I focused on user authentication, leveraging backend REST API endpoints and Azure App Service for a seamless login experience.</p>
+              <div class="btm-buttons">
+                <span class="toggle-btn readmore-btn">Read More</span>
+                <div class="links">
+                    <a class="link" href="https://husky-study-scout-q3ok.onrender.com/" target="_blank" rel="noopener">View Website</a>
+                    <a class="link" href="https://github.com/LydiaSorbo/info441-finalProject" target="_blank" rel="noopener">View Code</a>
+                </div>
+              </div>
+            </div>
+          </article>
+  
+          <article class="card" tabindex="0" data-tags="React,JavaScript" data-title="Woven World" data-desc="Educational web-based game on textile waste and sustainable fashion">
+            <div class="thumb"><img src="/images/wovenWorld.png" alt="Screenshot of Woven World game"></div>
+            <div class="body">
+              <h3 class="title">Woven World</h3>
+              <div class="tech"><span class="badge">React</span><span class="badge">JavaScript</span></div>
+              <p class="desc" data-full="An interactive, retro-inspired web game where players explore a pixelated village and complete NPC-guided tasks to learn more about fabric sustainability. I replicated FIGMA mockups from our team's designer in a React environment and ensured responsiveness across various devices. I also developed the core player movement system (both button-based and WASD controls) and created dynamic pop-up dialogue components that adapt based on user interaction. This included state management logic to track player progress, ensuring seamless narrative flow." data-short="An interactive, retro-inspired web game where players explore a pixelated village and complete NPC-guided tasks to learn more about fabric sustainability.">An interactive, retro-inspired web game where players explore a pixelated village and complete NPC-guided tasks to learn more about fabric sustainability. I replicated FIGMA mockups from our team's designer in a React environment and ensured responsiveness across various devices. I also developed the core player movement system (both button-based and WASD controls) and created dynamic pop-up dialogue components that adapt based on user interaction. This included state management logic to track player progress, ensuring seamless narrative flow. </p>
+              <div class="btm-buttons">
+              <span class="toggle-btn readmore-btn">Read More</span>
+              <div class="links">
+                <a class="link" href="https://woven-world.web.app/" target="_blank" rel="noopener">View Website</a>
+              </div>
+            </div>
+            </div>
+          </article>
+  
+        </div>
+        <div id="empty" class="empty" hidden>No projects match your filters. Try clearing the search or selecting a different tech.</div>
+      </section>
+
+    <footer>
+      © <span id="y"></span> Lydia Sorbo • <a class="link" href="mailto:lesorbo@gmail.com">lesorbo@gmail.com</a>
+    </footer>
+  </div>
+
+  <script>
+    // Simple reveal animation using IntersectionObserver
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: .2 });
+    document.querySelectorAll('.card').forEach(el => io.observe(el));
+
+    // Filter + search logic
+    const chips = document.querySelectorAll('.chip');
+    const grid = document.getElementById('grid');
+    const cards = Array.from(grid.children);
+    const q = document.getElementById('q');
+    const empty = document.getElementById('empty');
+
+    let activeFilter = 'all';
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.setAttribute('aria-pressed', 'false'));
+        chip.setAttribute('aria-pressed', 'true');
+        activeFilter = chip.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    q.addEventListener('input', applyFilters);
+
+    function matches(card){
+      const text = (card.dataset.title + ' ' + card.dataset.desc + ' ' + card.dataset.tags).toLowerCase();
+      const passesText = text.includes(q.value.trim().toLowerCase());
+      const tags = card.dataset.tags.split(',').map(s => s.trim());
+      const passesTag = (activeFilter === 'all') || tags.includes(activeFilter);
+      return passesText && passesTag;
+    }
+
+    function applyFilters(){
+      let any = false;
+      cards.forEach(card => {
+        const show = matches(card);
+        card.style.display = show ? '' : 'none';
+        any = any || show;
+      });
+      empty.hidden = any;
+    }
+
+    // Keyboard: Enter on focused card opens first link (View Website)
+    grid.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const a = e.target.querySelector('.links a');
+        if (a) a.click();
+      }
+    });
+
+    // Footer year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    document.querySelectorAll('.card').forEach(card => {
+      const btn = card.querySelector('.toggle-btn');
+      const desc = card.querySelector('.desc');
+      const fullText = desc.getAttribute('data-full');
+      const shortText = desc.getAttribute('data-short');
+      desc.textContent = shortText;
+
+      btn.addEventListener('click', () => {
+        if (desc.textContent === shortText) {
+          desc.textContent = fullText;
+          btn.textContent = 'Read Less';
+        } else {
+          desc.textContent = shortText;
+          btn.textContent = 'Read More';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
